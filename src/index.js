@@ -15,7 +15,7 @@ app.use(express.json()); // Para poder recibir transacciones JSON en POST reques
 const PORT = process.env.PORT || 8001; // Puerto 8001 para el Nodo 1
 
 // Endpoint para compartir la cadena
-app.get("/express", (req, res) => {
+app.get("/", (req, res) => {
   res.json({
     mensaje: "Blockchain local del Nodo Express",
     longitud: 0,

@@ -59,7 +59,7 @@ const minar = async (req, res) => {
     if (errorGrados) throw errorGrados;
 
     // 5. Limpiar mempool
-    await supabase.from("mempool").delete().eq("id", req.params.id);
+    await supabase.from("mempool").delete().eq("id", transaccion.id);
 
     // 6. Propagar bloque a nodos registrados
     // Obtenemos los nodos de nuestra tabla (excluyendo el nuestro si lo tuviéramos ahí)

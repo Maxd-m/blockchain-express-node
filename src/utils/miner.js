@@ -44,6 +44,44 @@ const calcularProofOfWork = (transaccion, hashAnterior) => {
   return { hash, nonce };
 };
 
+/**
+ * Verifica que el hash de un bloque entrante sea legítimo y cumpla la dificultad.
+ * @param {Object} bloque - El bloque completo recibido en el request
+ * @returns {Boolean} - true si es válido, false si es inválido
+ */
+const verificarHash = (bloque) => {
+  const dificultad = "000"; // Debe ser la misma que usaste al minar
+
+  // 1. Extraemos los campos EXACTOS y en el mismo ORDEN que pide el PDF
+  const {
+    persona_id,
+    institucion_id,
+    titulo_obtenido,
+    fecha_fin,
+    hash_anterior,
+    nonce,
+    hash_actual,
+  } = bloque;
+
+  // 2. Reconstruimos la cadena original
+  const dataAHashear = `${persona_id}${institucion_id}${titulo_obtenido}${fecha_fin}${hash_anterior}${nonce}`;
+
+  // 3. Volvemos a calcular el hash por nuestra cuenta
+  const hashCalculado = crypto
+    .createHash("sha256")
+    .update(dataAHashear)
+    .digest("hex");
+
+  // 4. Validamos dos cosas:
+  // - Que el hash calculado sea igual al que dice el bloque
+  // - Que el hash empiece con la dificultad requerida ("000")
+  const esHashCorrecto = hashCalculado === hash_actual;
+  const cumpleDificultad = hashCalculado.startsWith(dificultad);
+
+  return esHashCorrecto && cumpleDificultad;
+};
+
 module.exports = {
   calcularProofOfWork,
+  verificarHash,
 };
