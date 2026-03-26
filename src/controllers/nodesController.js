@@ -1,6 +1,5 @@
 const supabase = require("../config/supabase");
 
-// POST - Crear una nueva práctica
 const crearNodo = async (req, res) => {
   const { url, nombre, activo } = req.body;
 
@@ -13,7 +12,7 @@ const crearNodo = async (req, res) => {
         activo,
       },
     ])
-    .select(); // Nota: Agregué .select() para que Supabase te devuelva el registro creado
+    .select();
 
   if (error) return res.status(500).json({ mensaje: error.message });
   res.status(201).json(data);
