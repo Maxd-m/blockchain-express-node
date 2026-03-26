@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  nodo-express:
+    build: .
+    container_name: backend_express
+    ports:
+      - "8001:8001" # Mapea el puerto 8001 de tu PC/VPS al 8001 del contenedor
+    env_file:
+      - .env
+    environment:
+      - PORT=8001
+    volumes:
+      - .:/app # Sincroniza tus archivos locales con el contenedor (ideal para desarrollo local)
+      - /app/node_modules # Evita que tu node_modules local sobrescriba el del contenedor
+    command: npm run dev # Usa nodemon para desarrollo
