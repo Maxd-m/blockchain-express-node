@@ -122,7 +122,7 @@ const resolverConflictos = async (req, res) => {
 const crearNodo = async (req, res) => {
   const { url, nombre, activo } = req.body;
   const { data, error } = await supabase
-    .from("nodos_conocidos")
+    .from("nodos")
     .insert([{ url, nombre, activo }])
     .select();
   if (error) return res.status(500).json({ mensaje: error.message });

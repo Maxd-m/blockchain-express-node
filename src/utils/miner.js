@@ -13,7 +13,7 @@ const calcularProofOfWork = (transaccion, hashAnterior) => {
   // La dificultad determina cuántos ceros debe tener el hash al inicio.
   // "000" es un buen balance para pruebas (es rápido pero demuestra el concepto).
   // Si tu profesor te pide más dificultad, solo agrega más ceros (ej. "0000").
-  const dificultad = "00";
+  const dificultad = "000";
 
   // Extraemos estrictamente los campos que pide el documento para el hash
   const { persona_id, institucion_id, titulo_obtenido, fecha_fin } =
