@@ -18,6 +18,8 @@ const crearNodo = async (req, res) => {
   res.status(201).json(data);
 };
 
+//pendiente: método para resolver conflictos
+
 module.exports = {
   crearNodo,
 };
