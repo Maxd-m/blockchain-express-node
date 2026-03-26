@@ -68,7 +68,7 @@ const minar = async (req, res) => {
     if (nodos && nodos.length > 0) {
       // Disparamos las peticiones de forma asíncrona sin bloquear la respuesta
       nodos.forEach((nodo) => {
-        fetch(`${nodo.url}/blocks`, {
+        fetch(`${nodo.url}/chain`, {
           // Asumiendo que el endpoint de recepción sea POST /blocks
           method: "POST",
           headers: { "Content-Type": "application/json" },

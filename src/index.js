@@ -3,6 +3,7 @@ require("dotenv").config();
 const transacRoutes = require("./routes/transactionRoutes");
 const nodeRoutes = require("./routes/nodeRoutes");
 const mineRoutes = require("./routes/mineRoutes");
+const chainRoutes = require("./routes/chainRoutes");
 
 const express = require("express");
 const cors = require("cors");
@@ -25,6 +26,7 @@ app.get("/express", (req, res) => {
 app.use("/transactions", transacRoutes);
 app.use("/nodes", nodeRoutes);
 app.use("/mine", mineRoutes);
+app.use("/chain", chainRoutes);
 
 app.listen(PORT, () => {
   console.log(`Nodo Express corriendo en http://localhost:${PORT}`);
