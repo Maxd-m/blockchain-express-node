@@ -1,6 +1,6 @@
 # Blockchain en Node.js (Proyecto académico)
 
-Este proyecto implementa una cadena de bloques (blockchain) básica usando Express.js y conceptos clave como bloques, transacciones, minería, nodos y consenso.
+Este proyecto implementa una cadena de bloques (blockchain) para llevar el registro de obtención de grados académicos usando Express.js y conceptos clave como bloques, transacciones, minería, nodos y consenso.
 
 ## 📁 Estructura del proyecto
 
@@ -21,19 +21,28 @@ Este proyecto implementa una cadena de bloques (blockchain) básica usando Expre
 npm install
 ```
 
-2. Iniciar servidor:
+2. Variables de Entorno
+   Crea un archivo `.env` en la raíz del proyecto basándote en el archivo `.env.example`.
+
+3. Base de datos
+   Este proyecto requiere una base de datos PostgreSQL alojada en Supabase.
+   Para inicializar las tablas necesarias (`grados`, `mempool`, `nodos_conocidos`, etc.), por favor ejecuta el script SQL que se encuentra en `schema.sql`
+
+4. Iniciar servidor:
 
 ```bash
 npm start
 ```
 
-3. Abrir en el navegador:
+4. Abrir en el navegador:
 
 - `http://localhost:3000` (UI web)
 
 ---
 
 ## 🧩 Endpoints principales
+
+**Para mas informacion revisar el archivo openapi.yaml**
 
 ### 1) Cadena de bloques
 
@@ -43,16 +52,6 @@ npm start
 
 - `POST /chain`
   - Agrega un bloque nuevo como dato. (Puede usarse para pruebas o extensión de la cadena).
-  - Cuerpo (JSON): datos del bloque, por ejemplo:
-    ```json
-    {
-      "index": 1,
-      "timestamp": "2026-03-26T...",
-      "transactions": [],
-      "proof": 12345,
-      "previous_hash": "abc123"
-    }
-    ```
 
 ### 2) Minar
 
@@ -65,25 +64,11 @@ npm start
 
 - `POST /transactions`
   - Crea una nueva transacción y la añade a la lista de transacciones pendientes.
-  - Cuerpo (JSON requerido):
-    ```json
-    {
-      "sender": "direccion_origen",
-      "recipient": "direccion_destino",
-      "amount": 5
-    }
-    ```
 
 ### 4) Nodos y consenso
 
 - `POST /nodes/register`
   - Registrar nuevos nodos de la red.
-  - Cuerpo (JSON):
-    ```json
-    {
-      "nodes": ["http://localhost:3001", "http://localhost:3002"]
-    }
-    ```
 
 - `GET /nodes/resolve`
   - Ejecuta el algoritmo de consenso para resolver conflictos entre nodos y reemplaza la cadena por la más larga válida.
@@ -92,7 +77,7 @@ npm start
 
 ## 🛠️ Funcionalidades implementadas
 
-- Estructura básica blockchain con bloque (`index`, `timestamp`, `transactions`, `proof`, `previous_hash`).
+- Estructura de bloque adaptada a registros académicos (`persona_id`, `institucion_id`, `titulo_obtenido`, `hash_actual`, `hash_anterior`, `nonce`).
 - Gestión de transacciones pendientes.
 - Minería con prueba de trabajo (PoW).
 - Validación del hash y de la cadena.
@@ -109,10 +94,22 @@ npm start
 curl http://localhost:3000/chain
 ```
 
-- Crear transacción:
+- Crear transacción (registro académico):
 
 ```bash
-curl -X POST http://localhost:3000/transactions -H "Content-Type: application/json" -d '{"sender":"a","recipient":"b","amount":1}'
+curl -X POST http://localhost:3000/transactions \
+-H "Content-Type: application/json" \
+-d '{
+  "persona_id": "11111111-1111-1111-1111-111111111111",
+  "institucion_id": "22222222-2222-2222-2222-222222222222",
+  "programa_id": "33333333-3333-3333-3333-333333333333",
+  "fecha_inicio": "2018-08-15",
+  "fecha_fin": "2022-06-01",
+  "titulo_obtenido": "Ingeniero en Sistemas Computacionales",
+  "numero_cedula": "CED-12345678",
+  "titulo_tesis": "Implementación de Redes Blockchain",
+  "menciones": "Mención Honorífica"
+}'
 ```
 
 - Minar bloque:
@@ -124,7 +121,13 @@ curl -X POST http://localhost:3000/mine
 - Registrar nodo:
 
 ```bash
-curl -X POST http://localhost:3000/nodes/register -H "Content-Type: application/json" -d '{"nodes":["http://localhost:3001"]}'
+curl -X POST http://localhost:3000/nodes/register \
+-H "Content-Type: application/json" \
+-d '{
+  "url": "http://localhost:3001",
+  "nombre": "Nodo de mi compañero",
+  "activo": true
+}'
 ```
 
 - Resolver conflictos:
