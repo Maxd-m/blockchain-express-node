@@ -3,18 +3,269 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Blockchain Nodo Express</title>
+    <title>Blockchain Node UI</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>Panel de Control - Blockchain</h1>
+    <div class="main-container">
+      <!-- <div class="left-column">
+        <div class="form-section">
+          <h3>Transaccion</h3>
+          <form id="form-transaction">
+            <div class="input-group">
+              <label for="trans_persona">Persona ID:</label>
+              <input
+                type="text"
+                id="trans_persona"
+                placeholder="Ingresa ID de persona"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <label for="trans_institucion">Institución ID:</label>
+              <input
+                type="text"
+                id="trans_institucion"
+                placeholder="Ingresa ID de institución"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <label for="trans_titulo">Título Obtenido:</label>
+              <input
+                type="text"
+                id="trans_titulo"
+                placeholder="Ej. Licenciatura en..."
+                required
+              />
+            </div>
+            <div class="input-group">
+              <label for="trans_cedula">Número Cédula:</label>
+              <input
+                type="text"
+                id="trans_cedula"
+                placeholder="Ej. 12345678"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <label for="trans_programa">Programa ID:</label>
+              <input
+                type="text"
+                id="trans_programa"
+                placeholder="UUID del programa"
+              />
+            </div>
 
-    <button id="btn-get-chain">Ver Blockchain Local</button>
-    <button id="btn-mine">Minar Nuevo Bloque</button>
+            <div class="input-group">
+              <label for="trans_fecha_inicio">Fecha Inicio:</label>
+              <input type="date" id="trans_fecha_inicio" />
+            </div>
 
-    <h2>Resultados:</h2>
-    <pre id="resultado">Esperando acción...</pre>
+            <div class="input-group">
+              <label for="trans_fecha_fin">Fecha Fin:</label>
+              <input type="date" id="trans_fecha_fin" />
+            </div>
 
+            <div class="input-group">
+              <label for="trans_tesis">Título de Tesis:</label>
+              <input
+                type="text"
+                id="trans_tesis"
+                placeholder="Título de tesis"
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="trans_menciones">Menciones:</label>
+              <input
+                type="text"
+                id="trans_menciones"
+                placeholder="Ej. Cum Laude"
+              />
+            </div>
+            <button type="submit" id="btn-create-transaction">Crear</button>
+          </form>
+        </div>
+
+        <div class="form-section">
+          <h3>Nuevo nodo</h3>
+          <form id="form-node">
+            <div class="input-group">
+              <label for="node_url">Node URL:</label>
+              <input
+                type="url"
+                id="node_url"
+                placeholder="Ej. http://localhost:8002"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <label for="node_name">Node Name:</label>
+              <input
+                type="text"
+                id="node_name"
+                placeholder="Ej. Nodo Guanajuato"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <label for="node_active">Active (true/false):</label>
+              <input
+                type="text"
+                id="node_active"
+                placeholder="true o false"
+                required
+              />
+            </div>
+            <div class="input-group spacer"></div>
+            <button type="submit" id="btn-register-node">Crear</button>
+          </form>
+        </div>
+      </div> -->
+
+      <div class="left-column">
+        <!-- Tabs -->
+        <div class="form-tabs">
+          <button class="tab-btn active" data-target="form-transaction">
+            Transacción
+          </button>
+          <button class="tab-btn" data-target="form-node">Nodo</button>
+        </div>
+
+        <!-- Formularios -->
+        <div class="form-container">
+          <div id="form-transaction" class="form-section active">
+            <h3>Transacción</h3>
+            <form id="form-transaction-form">
+              <!-- TODOS tus inputs aquí -->
+              <div class="input-group">
+                <label for="trans_persona">Persona ID:</label>
+                <input
+                  type="text"
+                  id="trans_persona"
+                  placeholder="Ingresa ID de persona"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <label for="trans_institucion">Institución ID:</label>
+                <input
+                  type="text"
+                  id="trans_institucion"
+                  placeholder="Ingresa ID de institución"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <label for="trans_titulo">Título Obtenido:</label>
+                <input
+                  type="text"
+                  id="trans_titulo"
+                  placeholder="Ej. Licenciatura en..."
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <label for="trans_cedula">Número Cédula:</label>
+                <input
+                  type="text"
+                  id="trans_cedula"
+                  placeholder="Ej. 12345678"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <label for="trans_programa">Programa ID:</label>
+                <input
+                  type="text"
+                  id="trans_programa"
+                  placeholder="UUID del programa"
+                />
+              </div>
+
+              <div class="input-group">
+                <label for="trans_fecha_inicio">Fecha Inicio:</label>
+                <input type="date" id="trans_fecha_inicio" />
+              </div>
+
+              <div class="input-group">
+                <label for="trans_fecha_fin">Fecha Fin:</label>
+                <input type="date" id="trans_fecha_fin" />
+              </div>
+
+              <div class="input-group">
+                <label for="trans_tesis">Título de Tesis:</label>
+                <input
+                  type="text"
+                  id="trans_tesis"
+                  placeholder="Título de tesis"
+                />
+              </div>
+
+              <div class="input-group">
+                <label for="trans_menciones">Menciones:</label>
+                <input
+                  type="text"
+                  id="trans_menciones"
+                  placeholder="Ej. Cum Laude"
+                />
+              </div>
+              <button type="submit">Crear</button>
+            </form>
+          </div>
+
+          <div id="form-node" class="form-section hidden">
+            <h3>Nuevo nodo</h3>
+            <form id="form-node-form">
+              <!-- inputs nodo -->
+              <div class="input-group">
+                <label for="node_url">Node URL:</label>
+                <input
+                  type="url"
+                  id="node_url"
+                  placeholder="Ej. http://localhost:8002"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <label for="node_name">Node Name:</label>
+                <input
+                  type="text"
+                  id="node_name"
+                  placeholder="Ej. Nodo Guanajuato"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <label for="node_active">Active (true/false):</label>
+                <input
+                  type="text"
+                  id="node_active"
+                  placeholder="true o false"
+                  required
+                />
+              </div>
+              <div class="input-group spacer"></div>
+              <button type="submit">Crear</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-column">
+        <div class="top-buttons">
+          <button id="btn-get-chain">Ver cadena</button>
+          <button id="btn-mine">Minar ultima transaccion</button>
+          <button id="btn-resolve-conflicts">Resolver conflictos</button>
+          <button id="btn-docs">Ver Documentación</button>
+        </div>
+
+        <div class="results-container">
+          <pre id="results-display">Resultado...</pre>
+        </div>
+      </div>
+    </div>
     <script src="app.js"></script>
   </body>
 </html>

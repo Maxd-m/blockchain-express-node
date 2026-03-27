@@ -1,0 +1,210 @@
+/* styles.css */
+
+/* Variables para colores (inspirados en /docs) */
+:root {
+  --bg-color: #0b1419;
+  --text-color: #f0f4f7;
+  --accent-green: #37b77b;
+  --accent-blue: #3d86cc;
+  --form-bg: #111e24;
+  --input-bg: #15242b;
+  --border-color: #2a4049;
+  --button-hover: #2e9666;
+  --button-blue-hover: #326fac;
+  --docs-btn-bg: #8b5cf6; /* morado (ej. estilo docs/devtools) */
+  --docs-btn-hover: #7c3aed;
+  --results-bg: #0d1a20;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.main-container {
+  display: flex;
+  height: 100vh;
+  padding: 20px;
+  gap: 20px;
+}
+
+.left-column {
+  flex: 1; /* Ocupa 1 parte del espacio */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.right-column {
+  flex: 2; /* Ocupa 2 partes del espacio */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Estilos de formularios */
+.form-section {
+  background-color: var(--form-bg);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.form-section h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+}
+
+#form-transaction,
+#form-node {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center; /* Alinea etiquetas e inputs verticalmente */
+  gap: 10px;
+}
+
+.input-group label {
+  flex: 1; /* Etiqueta ocupa 1 parte */
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+.input-group input {
+  flex: 3; /* Input ocupa 3 partes */
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--accent-green);
+}
+
+/* Espaciador para completar 4 líneas en wireframe */
+.input-group.spacer {
+  height: 40px; /* Altura de una línea de input normal */
+}
+
+/* Botones de formularios (verdes, como los POST de /docs) */
+.form-section button[type="submit"] {
+  background-color: var(--accent-green);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  align-self: flex-start; /* Alinea a la izquierda, como en wireframe */
+}
+
+.form-section button[type="submit"]:hover {
+  background-color: var(--button-hover);
+}
+
+/* Estilos columna derecha */
+.top-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Botones superiores (azules, para GET de /docs) */
+#btn-get-chain,
+#btn-mine,
+#btn-resolve-conflicts {
+  background-color: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#btn-get-chain:hover,
+#btn-mine:hover,
+#btn-resolve-conflicts:hover {
+  background-color: var(--button-blue-hover);
+}
+
+/* Botones superiores (azules, para GET de /docs) */
+#btn-docs {
+  background-color: var(--docs-btn-bg);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#btn-docs:hover {
+  background-color: var(--docs-btn-hover);
+}
+
+/* Estilos de resultados */
+.results-container {
+  flex: 1; /* Ocupa el espacio restante */
+  background-color: var(--results-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  overflow: auto; /* Scroll si el resultado es muy largo */
+}
+
+#results-display {
+  margin: 0;
+  font-family: "Monaco", "Courier New", monospace;
+  font-size: 0.9rem;
+  color: #a8bcca;
+}
+
+/* Estilo de error opcional */
+#results-display.error {
+  color: #cc4f54;
+}
+
+.form-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tab-btn {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+.tab-btn.active {
+  background-color: var(--accent-blue);
+}
+
+.form-section.hidden {
+  display: none;
+}
+
+.form-section.active {
+  display: flex;
+  flex-direction: column;
+}
+
+.hidden {
+  display: none !important;
+}

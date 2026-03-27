@@ -49,7 +49,7 @@ const resolverConflictos = async (req, res) => {
 
     // 2. Obtener los demás nodos registrados
     const { data: nodos, error: errorNodos } = await supabase
-      .from("nodos_conocidos") // Asegúrate de usar el nombre correcto de tu tabla de nodos
+      .from("nodos") // Asegúrate de usar el nombre correcto de tu tabla de nodos
       .select("url");
 
     if (errorNodos) throw errorNodos;
