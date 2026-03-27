@@ -1,0 +1,183 @@
+openapi: 3.0.0
+info:
+  title: Blockchain Node API
+  description: API para la gestión de un nodo de blockchain, incluyendo minería, propagación de bloques, registro de nodos y manejo de mempool.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8004
+    description: Nodo Express
+paths:
+  /transactions:
+    post:
+      summary: Crear una nueva transacción
+      description: Registra una nueva transacción en la mempool y, si proviene de un cliente, la propaga a los demás nodos conocidos.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransaccionInput"
+      responses:
+        "201":
+          description: Transacción recibida y registrada
+        "500":
+          description: Error interno del servidor
+
+  /nodes/register:
+    post:
+      summary: Registrar un nuevo nodo
+      description: Añade un nodo a la lista de nodos conocidos de la red.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NodoInput"
+      responses:
+        "201":
+          description: Nodo registrado exitosamente
+        "500":
+          description: Error interno del servidor
+
+  /nodes/resolve:
+    get:
+      summary: Resolver conflictos de consenso
+      description: Compara la cadena local con las de los nodos vecinos y adopta la cadena más larga que sea criptográficamente válida.
+      responses:
+        "200":
+          description: Conflicto resuelto exitosamente.
+        "500":
+          description: Error al resolver conflictos
+
+  /mine:
+    post:
+      summary: Minar un nuevo bloque
+      description: Toma la transacción más antigua de la mempool, calcula el Proof of Work, crea un bloque, lo guarda localmente y lo propaga a la red.
+      responses:
+        "201":
+          description: Bloque minado y propagado con éxito
+        "404":
+          description: Transacción no encontrada en mempool
+        "500":
+          description: Error interno del servidor
+
+  /chain:
+    get:
+      summary: Listar todos los bloques
+      description: Obtiene la cadena de bloques completa desde la base de datos local.
+      responses:
+        "200":
+          description: Lista de bloques obtenida con éxito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bloque"
+        "500":
+          description: Error interno del servidor
+
+  /chain/blocks:
+    post:
+      summary: Añadir un bloque entrante (propagado)
+      description: Recibe un bloque minado por otro nodo, verifica su Hash (Proof of Work) y su enlace con la cadena local antes de insertarlo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Bloque"
+      responses:
+        "201":
+          description: Bloque validado y añadido a la cadena local exitosamente
+        "400":
+          description: Bloque rechazado por Hash inválido o sin PoW
+        "409":
+          description: Desincronización de cadena (Hash anterior no coincide)
+        "500":
+          description: Error interno del servidor
+
+components:
+  schemas:
+    TransaccionInput:
+      type: object
+      required:
+        - persona_id
+        - institucion_id
+        - titulo_obtenido
+        - numero_cedula
+      properties:
+        persona_id:
+          type: string
+        institucion_id:
+          type: string
+        programa_id:
+          type: string
+        fecha_inicio:
+          type: string
+          format: date
+        fecha_fin:
+          type: string
+          format: date
+        titulo_obtenido:
+          type: string
+        numero_cedula:
+          type: string
+        titulo_tesis:
+          type: string
+        menciones:
+          type: string
+        propagado:
+          type: boolean
+          description: Flag interno para evitar bucles infinitos en la red.
+
+    NodoInput:
+      type: object
+      required:
+        - url
+        - nombre
+      properties:
+        url:
+          type: string
+          example: "http://localhost:8002"
+        nombre:
+          type: string
+          example: "Nodo 2"
+        activo:
+          type: boolean
+          example: true
+
+    Bloque:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        persona_id:
+          type: string
+        institucion_id:
+          type: string
+        programa_id:
+          type: string
+        fecha_inicio:
+          type: string
+          format: date
+        fecha_fin:
+          type: string
+          format: date
+        titulo_obtenido:
+          type: string
+        numero_cedula:
+          type: string
+        titulo_tesis:
+          type: string
+        menciones:
+          type: string
+        hash_actual:
+          type: string
+        hash_anterior:
+          type: string
+        nonce:
+          type: integer
+        firmado_por:
+          type: string
