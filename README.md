@@ -1,4 +1,4 @@
-# Blockchain en Node.js (Proyecto académico)
+# Blockchain en express (Proyecto académico)
 
 Este proyecto implementa una cadena de bloques (blockchain) para llevar el registro de obtención de grados académicos usando Express.js y conceptos clave como bloques, transacciones, minería, nodos y consenso.
 
