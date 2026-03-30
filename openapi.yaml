@@ -76,8 +76,6 @@ paths:
                   $ref: "#/components/schemas/Bloque"
         "500":
           description: Error interno del servidor
-
-  /chain/blocks:
     post:
       summary: Añadir un bloque entrante (propagado)
       description: Recibe un bloque minado por otro nodo, verifica su Hash (Proof of Work) y su enlace con la cadena local antes de insertarlo.

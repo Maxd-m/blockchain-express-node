@@ -1,45 +1,66 @@
 const supabase = require("../config/supabase");
-const { verificarHash } = require("../utils/miner"); // <-- Importamos tu utilidad
+const { verificarHash, verificarHashSinDificultad } = require("../utils/miner"); // <-- Importamos tu utilidad
 
 /**
  * Método auxiliar para validar toda una cadena recibida de otro nodo.
- * Ahora incluye la validación criptográfica bloque por bloque.
+ * Incluye validación estructural, Proof of Work y enlaces criptográficos.
  */
 const cadenaEsValida = (cadena) => {
-  // Si la cadena está vacía, no es válida
-  if (!cadena || cadena.length === 0) return false;
+  if (!cadena || !Array.isArray(cadena) || cadena.length === 0) return false;
+
+  const camposRequeridos = [
+    "persona_id",
+    "institucion_id",
+    "titulo_obtenido",
+    "fecha_fin",
+    "hash_anterior",
+    "nonce",
+    "hash_actual",
+  ];
 
   for (let i = 0; i < cadena.length; i++) {
     const bloqueActual = cadena[i];
 
-    // 1. Verificamos el Proof of Work y la integridad de los datos de ESTE bloque
-    if (!verificarHash(bloqueActual)) {
+    // 1. Validar que la estructura sea correcta y no tenga nulos
+    const camposFaltantes = camposRequeridos.filter(
+      (campo) =>
+        bloqueActual[campo] === undefined || bloqueActual[campo] === null,
+    );
+
+    if (camposFaltantes.length > 0) {
       console.log(
-        `[Consenso] Bloque inválido detectado (Hash/PoW incorrecto). ID: ${bloqueActual.id}`,
+        `[Consenso] Cadena inválida: El bloque en el índice ${i} tiene campos faltantes o nulos (${camposFaltantes.join(", ")}).`,
       );
       return false;
     }
 
-    // 2. Verificamos el enlace temporal (cadena) con el bloque anterior
-    // Omitimos el bloque 0 porque es el Génesis y no tiene bloque anterior
+    // 2. Verificamos el Proof of Work y la integridad de los datos
+    if (!verificarHashSinDificultad(bloqueActual)) {
+      console.log(
+        `[Consenso] Cadena inválida: Bloque con Hash/PoW incorrecto. Índice: ${i}, ID: ${bloqueActual.id}`,
+      );
+      return false;
+    }
+
+    // 3. Verificamos el enlace temporal con el bloque anterior
     if (i > 0) {
       const bloqueAnterior = cadena[i - 1];
       if (bloqueActual.hash_anterior !== bloqueAnterior.hash_actual) {
         console.log(
-          `[Consenso] Enlace roto en la cadena. El hash_anterior no coincide en el índice ${i}`,
+          `[Consenso] Cadena inválida: Enlace roto. El hash_anterior del índice ${i} no coincide con el hash_actual del índice ${i - 1}.`,
         );
         return false;
       }
     }
   }
 
-  return true; // Si sobrevive al ciclo, la cadena es criptográficamente perfecta
+  return true; // La cadena pasó todas las auditorías
 };
 
 // GET /nodes/resolve
 const resolverConflictos = async (req, res) => {
   try {
-    // 1. Obtener mi propia cadena para saber mi longitud actual
+    // 1. Obtener mi propia cadena
     const { data: miCadena, error: errorMiCadena } = await supabase
       .from("grados")
       .select("*")
@@ -47,9 +68,9 @@ const resolverConflictos = async (req, res) => {
 
     if (errorMiCadena) throw errorMiCadena;
 
-    // 2. Obtener los demás nodos registrados
+    // 2. Obtener los demás nodos
     const { data: nodos, error: errorNodos } = await supabase
-      .from("nodos") // Asegúrate de usar el nombre correcto de tu tabla de nodos
+      .from("nodos")
       .select("url");
 
     if (errorNodos) throw errorNodos;
@@ -57,16 +78,41 @@ const resolverConflictos = async (req, res) => {
     let maximaLongitud = miCadena ? miCadena.length : 0;
     let cadenaMasLarga = null;
 
-    // 3. Consultar la cadena (GET /chain) de cada vecino en la red
+    // 3. Consultar la cadena de cada vecino
     if (nodos && nodos.length > 0) {
       for (const nodo of nodos) {
         try {
           const response = await fetch(`${nodo.url}/chain`);
 
+          // Solo procedemos si el HTTP Status es 200 OK
           if (response.ok) {
             const cadenaVecino = await response.json();
+            cadenaVecino.sort(
+              (a, b) => new Date(a.creado_en) - new Date(b.creado_en),
+            );
 
-            // 4. Comparamos longitud y validamos matemáticamente usando nuestro método auxiliar
+            // A) Validación: Asegurarnos de que nos devolvieron un Array
+            if (!Array.isArray(cadenaVecino)) {
+              console.log(
+                `[Consenso] Ignorando nodo ${nodo.url}: La respuesta no es un arreglo JSON válido.`,
+              );
+              continue; // Brincamos al siguiente nodo
+            }
+
+            // B) Validación: Revisar si compartimos el mismo Bloque Génesis (Bloque 0)
+            // Si ambas cadenas tienen bloques, sus hashes iniciales deben ser idénticos
+            if (miCadena.length > 0 && cadenaVecino.length > 0) {
+              if (miCadena[0].hash_actual !== cadenaVecino[0].hash_actual) {
+                console.log(
+                  `[Consenso] Ignorando nodo ${nodo.url}: Su bloque Génesis es diferente al nuestro (Pertenecen a otra red).`,
+                );
+                // console.log(miCadena[0]);
+                // console.log(cadenaVecino[0]);
+                continue;
+              }
+            }
+
+            // 4. Comparamos longitud y validamos matemáticamente y estructuralmente
             if (
               cadenaVecino.length > maximaLongitud &&
               cadenaEsValida(cadenaVecino)
@@ -76,25 +122,44 @@ const resolverConflictos = async (req, res) => {
             }
           }
         } catch (err) {
-          console.log(`[Consenso] Nodo inaccesible: ${nodo.url}`);
+          console.log(
+            `[Consenso] Nodo inaccesible o error de red: ${nodo.url}`,
+          );
         }
       }
     }
 
-    // 5. Si encontramos una cadena válida más larga, sobreescribimos la nuestra
+    // 5. Si encontramos una cadena válida más larga, sobreescribimos
     if (cadenaMasLarga) {
-      // a) Vaciamos nuestra tabla local de grados
       const { error: errorBorrado } = await supabase
         .from("grados")
         .delete()
-        .neq("id", "00000000-0000-0000-0000-000000000000"); // Hack de Supabase para borrar todos los registros (usar un ID que no exista o .not("id", "is", null))
+        .neq("id", "00000000-0000-0000-0000-000000000000");
 
       if (errorBorrado) throw errorBorrado;
 
-      // b) Insertamos la nueva cadena ganadora
+      // c) Limpiamos los datos antes de insertar (Opcional pero recomendado)
+      // Extraemos solo las columnas que nuestra BD acepta, ignorando basura extra
+      const datosLimpios = cadenaMasLarga.map((b) => ({
+        id: b.id,
+        persona_id: b.persona_id,
+        institucion_id: b.institucion_id,
+        programa_id: b.programa_id, // Asegúrate de tener este o quitarlo si no lo usas
+        fecha_inicio: b.fecha_inicio,
+        fecha_fin: b.fecha_fin,
+        titulo_obtenido: b.titulo_obtenido,
+        numero_cedula: b.numero_cedula,
+        titulo_tesis: b.titulo_tesis,
+        menciones: b.menciones,
+        hash_actual: b.hash_actual,
+        hash_anterior: b.hash_anterior,
+        nonce: b.nonce,
+        firmado_por: b.firmado_por,
+      }));
+
       const { error: errorInsercion } = await supabase
         .from("grados")
-        .insert(cadenaMasLarga);
+        .insert(datosLimpios);
 
       if (errorInsercion) throw errorInsercion;
 
@@ -105,7 +170,7 @@ const resolverConflictos = async (req, res) => {
       });
     }
 
-    // 6. Si nadie tiene una cadena válida más larga, conservamos la nuestra
+    // 6. Si nadie tiene una cadena válida más larga
     res.status(200).json({
       mensaje: "Conflicto resuelto: Nuestra cadena ya es la más larga y válida",
       longitud: maximaLongitud,

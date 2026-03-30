@@ -10,6 +10,35 @@ const listarBloques = async (req, res) => {
 // Endpoint que recibe un bloque minado por otro nodo (ej. POST /blocks)
 const addBloque = async (req, res) => {
   const bloqueEntrante = req.body;
+  console.log(
+    "JSON recibido del otro nodo:",
+    JSON.stringify(bloqueEntrante, null, 2),
+  );
+  // 1. Validar que vengan todos los campos requeridos
+  const camposRequeridos = [
+    "persona_id",
+    "institucion_id",
+    "titulo_obtenido",
+    "fecha_fin",
+    "hash_anterior",
+    "nonce",
+    "hash_actual",
+  ];
+
+  // const camposFaltantes = camposRequeridos.filter((campo) => !bloque[campo]);
+  // CORRECCIÓN: Usamos bloqueEntrante y validamos estrictamente nulos o indefinidos
+  const camposFaltantes = camposRequeridos.filter(
+    (campo) =>
+      bloqueEntrante[campo] === undefined || bloqueEntrante[campo] === null,
+  );
+
+  if (camposFaltantes.length > 0) {
+    return res.status(400).json({
+      mensaje: "Bloque rechazado: Formato JSON incorrecto. Faltan datos.",
+      campos_faltantes: camposFaltantes,
+      tip: "Asegúrate de enviar las llaves exactamente con estos nombres en snake_case.",
+    });
+  }
 
   // 1. Verificar la integridad criptográfica del hash
   if (!verificarHash(bloqueEntrante)) {
